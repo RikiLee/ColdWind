@@ -16,11 +16,11 @@ namespace coldwind
 		VKContext& operator=(const VKContext&) = delete;
 		~VKContext() = default;
 
-		vk::PhysicalDevice getPhysicalDevice() const noexcept { return m_physicalDevice; }
-		const vk::UniqueDevice& getDevice() noexcept { return m_device; }
+		[[nodiscard]] vk::PhysicalDevice getPhysicalDevice() const noexcept { return m_physicalDevice; }
+		[[nodiscard]] const vk::UniqueDevice& getDevice() noexcept { return m_device; }
 
-		uint32_t getGraphicQueueFamilyIndex() const noexcept { return m_graphicsAndComputeQueueFamilyIndex; }
-		uint32_t getPresentQueueFamilyIndex() const noexcept { return m_presentQueueFamilyIndex; }
+		[[nodiscard]] uint32_t getGraphicQueueFamilyIndex() const noexcept { return m_graphicsAndComputeQueueFamilyIndex; }
+		[[nodiscard]] uint32_t getPresentQueueFamilyIndex() const noexcept { return m_presentQueueFamilyIndex; }
 
 	private:
 		void init(Instance& instance, Window& window)

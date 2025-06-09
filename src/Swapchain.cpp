@@ -9,52 +9,54 @@ namespace coldwind {
 
 	void SwapChain::createSwapchain(VKContext& context, Window& window)
 	{
+		if (window.getWindowExtent2D() == m_swapChainExtent2D) return;
+
 		vk::PhysicalDevice physicalDevice = context.getPhysicalDevice();
 		auto& surface = window.getSurface();
+		if (m_swapChainExtent2D == vk::Extent2D()) {
+			auto surfaceFormats = physicalDevice.getSurfaceFormatsKHR(surface.get());
+			if (surfaceFormats.result != vk::Result::eSuccess) {
+				spdlog::error("Failed to get surface formats!");
+				throw std::runtime_error("Failed to get surface formats!");
+			}
+
+			if (surfaceFormats.value.size() == 1 && surfaceFormats.value[0].format == vk::Format::eUndefined) {
+				m_surfaceFormat = { vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear };
+			}
+			else {
+				bool foundSuitableFormat = false;
+				for (const auto& format : surfaceFormats.value) {
+					if (format.format == vk::Format::eR8G8B8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
+						m_surfaceFormat = format;
+						foundSuitableFormat = true;
+						break;
+					}
+				}
+				if (!foundSuitableFormat) m_surfaceFormat = surfaceFormats.value[0];
+			}
+			spdlog::info("Selected surface format: {}, color space: {}", vk::to_string(m_surfaceFormat.format), vk::to_string(m_surfaceFormat.colorSpace));
+
+			auto presentModes = physicalDevice.getSurfacePresentModesKHR(surface.get());
+			if (presentModes.result != vk::Result::eSuccess) {
+				spdlog::error("Failed to get surface present modes!");
+				throw std::runtime_error("Failed to get surface present modes!");
+			}
+
+			m_presentMode = vk::PresentModeKHR::eFifo;
+			for (const auto& mode : presentModes.value) {
+				if (mode == vk::PresentModeKHR::eMailbox) {
+					m_presentMode = mode;
+					break;
+				}
+			}
+			spdlog::info("Selected present mode: {}", vk::to_string(m_presentMode));
+		}
+
 		auto surfaceCapabilities = physicalDevice.getSurfaceCapabilitiesKHR(surface.get());
 		if (surfaceCapabilities.result != vk::Result::eSuccess) {
 			spdlog::error("Failed to get surface capabilities!");
 			throw std::runtime_error("Failed to get surface capabilities!");
 		}
-
-		auto surfaceFormats = physicalDevice.getSurfaceFormatsKHR(surface.get());
-		if (surfaceFormats.result != vk::Result::eSuccess) {
-			spdlog::error("Failed to get surface formats!");
-			throw std::runtime_error("Failed to get surface formats!");
-		}
-
-		auto presentModes = physicalDevice.getSurfacePresentModesKHR(surface.get());
-		if (presentModes.result != vk::Result::eSuccess) {
-			spdlog::error("Failed to get surface present modes!");
-			throw std::runtime_error("Failed to get surface present modes!");
-		}
-
-		if (surfaceFormats.value.size() == 1 && surfaceFormats.value[0].format == vk::Format::eUndefined) {
-			m_surfaceFormat = { vk::Format::eB8G8R8A8Unorm, vk::ColorSpaceKHR::eSrgbNonlinear };
-		}
-		else {
-			bool foundSuitableFormat = false;
-			for (const auto& format : surfaceFormats.value) {
-				if (format.format == vk::Format::eR8G8B8A8Srgb && format.colorSpace == vk::ColorSpaceKHR::eSrgbNonlinear) {
-					m_surfaceFormat = format;
-					foundSuitableFormat = true;
-					break;
-				}
-			}
-			if (!foundSuitableFormat) m_surfaceFormat = surfaceFormats.value[0];
-		}
-		spdlog::info("Selected surface format: {}, color space: {}", vk::to_string(m_surfaceFormat.format), vk::to_string(m_surfaceFormat.colorSpace));
-
-
-		vk::PresentModeKHR presentMode = vk::PresentModeKHR::eFifo;
-		for (const auto& mode : presentModes.value) {
-			if (mode == vk::PresentModeKHR::eMailbox) {
-				presentMode = mode;
-				break;
-			}
-		}
-		spdlog::info("Selected present mode: {}", vk::to_string(presentMode));
-
 		if (surfaceCapabilities.value.currentExtent.width != UINT32_MAX) {
 			m_swapChainExtent2D = surfaceCapabilities.value.currentExtent;
 		}
@@ -95,7 +97,7 @@ namespace coldwind {
 		}
 		swapchainCreateInfo.preTransform = surfaceCapabilities.value.currentTransform;
 		swapchainCreateInfo.compositeAlpha = vk::CompositeAlphaFlagBitsKHR::eOpaque;
-		swapchainCreateInfo.presentMode = presentMode;
+		swapchainCreateInfo.presentMode = m_presentMode;
 		swapchainCreateInfo.clipped = VK_TRUE;
 		swapchainCreateInfo.oldSwapchain = nullptr;
 

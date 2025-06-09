@@ -20,5 +20,8 @@ namespace coldwind
 		SwapChain m_swapChain;
 
 		void mainLoop();
+
+		void onWindowResize();
+		static void windowResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }

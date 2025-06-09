@@ -17,14 +17,14 @@ namespace coldwind {
 		Window(Window&&) noexcept = delete;
 		Window& operator=(Window&&) noexcept = delete; 
 
-		bool shouldClose() const { return glfwWindowShouldClose(m_window); }
+		[[nodiscard]] bool shouldClose() const { return glfwWindowShouldClose(m_window); }
 		void pollEvents() const { glfwPollEvents(); }
 
-		inline GLFWwindow* getWindowPtr() const noexcept { return m_window; }
-		vk::UniqueSurfaceKHR& getSurface() noexcept { return m_surface; }
+		[[nodiscard]] inline GLFWwindow* getWindowPtr() const noexcept { return m_window; }
+		[[nodiscard]] vk::UniqueSurfaceKHR& getSurface() noexcept { return m_surface; }
 
-		vk::Extent2D getWindowExtent2D() const noexcept;
-		bool isMinimized() const noexcept;
+		[[nodiscard]] vk::Extent2D getWindowExtent2D() const noexcept;
+		[[nodiscard]] bool isMinimized() const noexcept;
 
 	private:
 		std::string m_title;
