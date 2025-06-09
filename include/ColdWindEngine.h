@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "VKContext.h"
+#include "Swapchain.h"
 
 namespace coldwind
 {
@@ -12,10 +12,12 @@ namespace coldwind
 		~ColdWindEngine() = default;
 
 		inline void run() { mainLoop(); }
+
 	private:
 		Instance m_instance;
 		Window m_window;
 		VKContext m_context;
+		SwapChain m_swapChain;
 
 		void mainLoop();
 	};
