@@ -11,11 +11,11 @@ endif()
 
 find_package(Vulkan REQUIRED)
 find_package(glslang REQUIRED COMPONENTS
-    glslang          # 主库
-    SPIRV            # SPIR-V 支持
-    OGLCompiler      # OpenGL 编译器
-    OSDependent      # 系统相关功能
-    HLSL             # HLSL 支持（可选）
+    glslang
+    SPIRV
+    OGLCompiler
+    OSDependent
+    HLSL
 )
 find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glfw3 REQUIRED)
