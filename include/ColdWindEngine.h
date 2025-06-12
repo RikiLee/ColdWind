@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "VKContext.h"
+#include "Swapchain.h"
+#include <vma/vk_mem_alloc.h>
 
 namespace coldwind
 {
@@ -9,14 +10,20 @@ namespace coldwind
 		explicit ColdWindEngine(const std::string& appName, uint32_t width, uint32_t height);
 		ColdWindEngine(const ColdWindEngine&) = delete;
 		ColdWindEngine& operator=(const ColdWindEngine&) = delete;
-		~ColdWindEngine() = default;
+		~ColdWindEngine();
 
 		inline void run() { mainLoop(); }
+
 	private:
 		Instance m_instance;
 		Window m_window;
 		VKContext m_context;
+		SwapChain m_swapChain;
+		VmaAllocator m_vmaAllocator;
 
 		void mainLoop();
+
+		void onWindowResize();
+		static void windowResizeCallback(GLFWwindow* window, int width, int height);
 	};
 }

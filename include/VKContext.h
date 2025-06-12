@@ -4,7 +4,6 @@
 #include <vector>
 #include <map>
 
-#include "Instance.h"
 #include "Window.h"
 
 namespace coldwind
@@ -17,29 +16,25 @@ namespace coldwind
 		VKContext& operator=(const VKContext&) = delete;
 		~VKContext() = default;
 
-		vk::PhysicalDevice getPhysicalDevice() const noexcept { return m_physicalDevice; }
-		const vk::UniqueDevice& getDevice() noexcept { return m_device; }
+		[[nodiscard]] vk::PhysicalDevice getPhysicalDevice() const noexcept { return m_physicalDevice; }
+		[[nodiscard]] const vk::UniqueDevice& getDevice() noexcept { return m_device; }
+
+		[[nodiscard]] uint32_t getGraphicQueueFamilyIndex() const noexcept { return m_graphicsAndComputeQueueFamilyIndex; }
+		[[nodiscard]] uint32_t getPresentQueueFamilyIndex() const noexcept { return m_presentQueueFamilyIndex; }
 
 	private:
-		inline void init() 
+		void init(Instance& instance, Window& window)
 		{
-			createSurface();
-			selectPhysicalDevice();
+			selectPhysicalDevice(instance, window);
 			createDevice();
-			createSwapchain();
 		}
 
 	private:
-		Instance& m_instanceRef;
-		Window& m_windowRef;
-
-		vk::UniqueSurfaceKHR m_surface;
-		void createSurface();
 
 		vk::PhysicalDevice m_physicalDevice;
 		uint32_t m_graphicsAndComputeQueueFamilyIndex = 0;
 		uint32_t m_presentQueueFamilyIndex = 0;
-		void selectPhysicalDevice();
+		void selectPhysicalDevice(Instance& instance, Window& window);
 		void checkDeviceExtensionSupport(vk::PhysicalDevice, std::map<const char*, uint8_t>&);
 		const char* getDeviceTypeString(vk::PhysicalDeviceType deviceType) const noexcept
 		{
@@ -55,12 +50,5 @@ namespace coldwind
 		vk::Queue m_graphicsAndComputeQueue;
 		vk::Queue m_presentQueue;
 		void createDevice();
-
-		vk::Extent2D m_swapChainExtent2D;
-		vk::SurfaceFormatKHR m_surfaceFormat;
-		vk::UniqueSwapchainKHR m_swapChain;
-		std::vector<vk::Image> m_swapChainImages;
-		std::vector<vk::UniqueImageView> m_swapChainImageViews;
-		void createSwapchain();
 	};
 }

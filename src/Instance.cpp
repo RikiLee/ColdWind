@@ -30,7 +30,7 @@ namespace coldwind
 
 		auto instanceVersionResult = vk::enumerateInstanceVersion();
 		if (instanceVersionResult.result != vk::Result::eSuccess) {
-			spdlog::error("Failed to enumerateInstanceVersion!");
+			spdlog::error("Failed to enumerateInstanceVersion! Error code: {}", vk::to_string(instanceVersionResult.result));
 			throw std::runtime_error("Failed to enumerateInstanceVersion");
 		}
 		else if (instanceVersionResult.value < USING_VK_API_VERSION) {
@@ -170,7 +170,7 @@ namespace coldwind
 			}
 		}
 		else {
-			spdlog::error("Failed to enumerate instance layer properties!");
+			spdlog::error("Failed to enumerate instance layer properties! Error code: {}", vk::to_string(instanceLayer.result));
 			throw std::runtime_error("Failed to enumerate instance layer properties!");
 		}
 	}
@@ -188,7 +188,7 @@ namespace coldwind
 			}
 		}
 		else {
-			spdlog::error("Failed to enumerate instance extension properties!");
+			spdlog::error("Failed to enumerate instance extension properties! Error code: {}", vk::to_string(instanceExtension.result));
 			throw std::runtime_error("Failed to enumerate instance extension properties!");
 		}
 	}

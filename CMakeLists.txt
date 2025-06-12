@@ -17,6 +17,7 @@ find_package(glslang REQUIRED COMPONENTS
     OSDependent      # 系统相关功能
     HLSL             # HLSL 支持（可选）
 )
+find_package(VulkanMemoryAllocator CONFIG REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(glm REQUIRED)
 
@@ -32,6 +33,7 @@ find_package(FFmpeg REQUIRED COMPONENTS
 )
 # log
 find_package(spdlog CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 file(GLOB INC_FILES include/*.h include/*.hpp)
 file(GLOB SRC_FILES src/*.c src/*.cpp)
@@ -75,8 +77,10 @@ target_link_libraries(${PROJECT_NAME}
         glslang::glslang
         glslang::SPIRV
         glslang::OSDependent
+        GPUOpen::VulkanMemoryAllocator
 
         spdlog::spdlog
+        imgui::imgui
 
         assimp::assimp
         ${FFMPEG_LIBRARIES}

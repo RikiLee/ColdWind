@@ -26,7 +26,7 @@ namespace coldwind
 		Instance& operator=(const Instance&) = delete;
 		~Instance() = default;
 
-		const vk::UniqueInstance& getVKInstance() const noexcept { return m_instance; }
+		[[nodiscard]] vk::UniqueInstance& getVKInstance() noexcept { return m_instance; }
 
 #ifdef NDEBUG
 		bool m_validationLayersEnabled = false;
