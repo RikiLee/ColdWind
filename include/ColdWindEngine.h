@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Swapchain.h"
-#include <vma/vk_mem_alloc.h>
 
 namespace coldwind
 {
@@ -19,7 +18,6 @@ namespace coldwind
 		Window m_window;
 		VKContext m_context;
 		SwapChain m_swapChain;
-		VmaAllocator m_vmaAllocator;
 
 		void mainLoop();
 

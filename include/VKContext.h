@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <vulkan/vulkan.hpp>
+#include <vma/vk_mem_alloc.h>
 
 #include <vector>
 #include <map>
@@ -14,19 +15,21 @@ namespace coldwind
 		VKContext(Instance& instance, Window& window);
 		VKContext(const VKContext&) = delete;
 		VKContext& operator=(const VKContext&) = delete;
-		~VKContext() = default;
+		~VKContext();
 
 		[[nodiscard]] vk::PhysicalDevice getPhysicalDevice() const noexcept { return m_physicalDevice; }
 		[[nodiscard]] const vk::UniqueDevice& getDevice() noexcept { return m_device; }
 
 		[[nodiscard]] uint32_t getGraphicQueueFamilyIndex() const noexcept { return m_graphicsAndComputeQueueFamilyIndex; }
 		[[nodiscard]] uint32_t getPresentQueueFamilyIndex() const noexcept { return m_presentQueueFamilyIndex; }
+		[[nodiscard]] VmaAllocator& getVmaAllocator() noexcept { return m_vmaAllocator; }
 
 	private:
 		void init(Instance& instance, Window& window)
 		{
 			selectPhysicalDevice(instance, window);
 			createDevice();
+			initVmaAllocator(instance);
 		}
 
 	private:
@@ -50,5 +53,8 @@ namespace coldwind
 		vk::Queue m_graphicsAndComputeQueue;
 		vk::Queue m_presentQueue;
 		void createDevice();
+
+		VmaAllocator m_vmaAllocator;
+		inline void initVmaAllocator(Instance& instance);
 	};
 }

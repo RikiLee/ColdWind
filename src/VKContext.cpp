@@ -1,4 +1,5 @@
-﻿#include "VKContext.h"
+﻿#define VMA_IMPLEMENTATION
+#include "VKContext.h"
 #include <spdlog/spdlog.h>
 #include <stdexcept>
 #include <set>
@@ -8,6 +9,11 @@ namespace coldwind
 	VKContext::VKContext(Instance& instance, Window& window)
 	{
 		init(instance, window);
+	}
+
+	VKContext::~VKContext()
+	{
+		vmaDestroyAllocator(m_vmaAllocator);
 	}
 
 	void VKContext::selectPhysicalDevice(Instance& instance, Window& window)
@@ -228,6 +234,24 @@ namespace coldwind
 
 		m_graphicsAndComputeQueue = m_device->getQueue(m_graphicsAndComputeQueueFamilyIndex, 0);
 		m_presentQueue = m_device->getQueue(m_presentQueueFamilyIndex, 0);
+	}
+
+	inline void VKContext::initVmaAllocator(Instance& instance)
+	{
+		VmaAllocatorCreateInfo vmaAllocatorCreateInfo{};
+		vmaAllocatorCreateInfo.flags = VMA_ALLOCATOR_CREATE_EXT_MEMORY_BUDGET_BIT;
+		vmaAllocatorCreateInfo.vulkanApiVersion = VK_API_VERSION_1_3;
+		vmaAllocatorCreateInfo.physicalDevice = m_physicalDevice;
+		vmaAllocatorCreateInfo.device = m_device.get();
+		vmaAllocatorCreateInfo.instance = instance.getVKInstance().get();
+		VkResult result = vmaCreateAllocator(&vmaAllocatorCreateInfo, &m_vmaAllocator);
+		if (result == VK_SUCCESS) {
+			spdlog::info("Succeed to create vma allocator!");
+		}
+		else {
+			spdlog::error("Failed to create vma allocator, error code: {}", vk::to_string(vk::Result(result)));
+			throw std::runtime_error("Failed to create vma allocator!");
+		}
 	}
 }
 
